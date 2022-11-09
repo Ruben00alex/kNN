@@ -88,38 +88,6 @@ def distanciaEuclidiana(puntoA, puntoB):
     # Aqui usamos una formula en vez de un ciclo porque es mas rapido, y tiene una complejidad de O(1) en vez de O(n)
     return distancia
 
-# Funcion que calcula la exactitud, precision, exhaustividad y F-score
-
-
-def calcularMetricas(clasesReales, clasesPredichas):
-    totalCorrectos = 0
-    totalIncorrectos = 0
-
-    # Aqui se calculan las metricas
-    for x, claseReal in enumerate(clasesReales):
-        if claseReal == clasesPredichas[x]:
-            print(' Clase real: ', claseReal,
-                  'Clase predicha: ', clasesPredichas[x])
-            print('Son iguales')
-            totalCorrectos += 1
-        else:
-            print('Son diferentes')
-            totalIncorrectos += 1
-    # Exactitud
-    exactitud = totalCorrectos / (totalCorrectos + totalIncorrectos)
-    # Precision
-    precision = totalCorrectos / len(clasesPredichas)
-    # Exhaustividad
-    exhaustividad = totalCorrectos / len(clasesReales)
-    # F-score
-    fScore = 2 * (precision * exhaustividad) / (precision + exhaustividad)
-
-    print('Exactitud: ', exactitud)
-    print('Precision: ', precision)
-    print('Exhaustividad: ', exhaustividad)
-    print('F-score: ', fScore)
-    return exactitud, precision, exhaustividad, fScore
-
 
 def clasificarPunto(punto, k):
     distancias = []
@@ -133,7 +101,6 @@ def clasificarPunto(punto, k):
     distancias.sort()
     for i in range(k):
         puntosKMascercanos.append(distancias[i][1])
-    # Se clasifica el punto
     # Se obtiene la clase mayoritaria
     claseMayoritaria = max(set(puntosKMascercanos),
                            key=puntosKMascercanos.count)
@@ -172,6 +139,19 @@ for punto in datosPrueba:
 
 for punto in puntosClasificados:
     clasesPredichas.append(punto[0][5])
+
+
+# Funcion que guarda los datos en un archivo csv
+def guardarDatos(nombre_archivo, datos):
+    archivo = open(nombre_archivo, 'w')
+    archivo.write('timestamp, x, y, z, w, clase\n')
+    for dato in datos:
+        archivo.write(str(dato[0][0]) + ',' + str(dato[0][1]) + ',' + str(dato[0][2]) +
+                      ',' + str(dato[0][3]) + ',' + str(dato[0][4]) + ',' + str(dato[0][5]) + '\n')
+    archivo.close()
+
+
+guardarDatos('participante_yh13_dataset_clasificado.csv', puntosClasificados)
 
 # Generar matriz de confusion
 
@@ -241,3 +221,34 @@ def matrizConfusion(clasesReales, clasesPredichas):
 
 matriz = matrizConfusion(clasesReales, clasesPredichas)
 print(matriz)
+
+# Se calcula la precision
+
+
+def precision(matriz):
+    precision = 0
+    for x in range(len(matriz)):
+        precision += matriz[x][x]
+    return precision/np.sum(matriz)
+
+
+def precisionClase(matriz):
+    precisionClase = []
+    for x in range(len(matriz)):
+        precisionClase.append(matriz[x][x]/np.sum(matriz[x]))
+    return precisionClase
+
+
+def recallClase(matriz):
+    recallClase = []
+    for x in range(len(matriz)):
+        # Aqui se calcula el recall de cada clase, donde se divide la diagonal de la matriz por la suma de la columna
+        recallClase.append(matriz[x][x]/np.sum(matriz[:, x]))
+    return recallClase
+
+
+print('Precision: ', precision(matriz))
+print('Precision de cada clase: ', precisionClase(matriz))
+print('Promedio de precision de cada clase: ', np.mean(precisionClase(matriz)))
+print('Recall de cada clase: ', recallClase(matriz))
+print('Promedio de recall de cada clase: ', np.mean(recallClase(matriz)))
