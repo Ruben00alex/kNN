@@ -1,24 +1,4 @@
-"""
-equisitos de diseño del sistema:
-• No es válido utilizar librerías que implementen la K-NN
-. Este debe ser unaimplementación tuya de todos los pasos del algoritmo K-NN, incluyendo
-el cálculo de las métricas deberá ser tu propia implementación.• Debe incluir al menos el
-llamado de 2 métodos:1. Un método para cargar el conjunto de datos de entrenamiento a memoria
-para que se pueda leer su contenidomientras lleguen datos nuevos a clasificar. Un ejemplo para invocar este método
-sería:Objetos[] leerDatosEntrenamiento(nombre_archivo)
 
-2. Un método que estime la distancia del punto a clasificar con todos los puntos de entrenamiento. Este métododebe recibir al menos 2 parámetos (el número de vecinos cercanos a utilizar (k) y el punto a clasificar.
-Si requieres incluir parámetros adicionales, lo dejo a tu consideración y deberás explicarlo.
-
-
-
-Requisitos:• Utilizar el 30% del conjunto de datos que se te dará para usarlo como conuntode datos de entrenamiento
-• El otro 70% lo utilizarás para la prueba. Durante la prueba, se ejecuta el K-nn ycada punto de este 70% lo clasifica
-en una de las clases.
-
-• Una vez que termine la prueba, el sistema debe estimar la exactitud, laprecisión, la exhaustividad
-y F-score; y mostrarlos en pantalla.
-"""
 # Importar librerías
 import math
 import numpy as np
@@ -84,25 +64,36 @@ print(datosPrueba)
 def distanciaEuclidiana(puntoA, puntoB):
     distancia = math.sqrt((puntoA[0] - puntoB[0])**2 + (puntoA[1] - puntoB[1])
                           ** 2 + (puntoA[2] - puntoB[2])**2 + (puntoA[3] - puntoB[3])**2)
+    # Ciclo for para generar un string que es equivalente a la distancia euclidiana de n dimensiones
+    string = ""
+    for i in range(len(puntoA)-1):
+        string += "(" + str(puntoA[i]) + "-" + str(puntoB[i]) + ")**2 + "
+    string = string[:-3]  # Aqui se quita el ultimo "+"
+    distancia = eval(string)  # Aqui se evalua el string
 
     # Aqui usamos una formula en vez de un ciclo porque es mas rapido, y tiene una complejidad de O(1) en vez de O(n)
     return distancia
 
 
+# punto es un vector de 5 dimensiones, donde las 4 primeras son las características y la última es la clase que tiene el punto.
 def clasificarPunto(punto, k):
-    distancias = []
+    distancias = []  # lista donde se guardan las distancias de todos los puntos de entrenamiento con el punto a clasificar
+    # lista donde se guardan los puntos de entrenamiento que son los k puntos mas cercanos al punto a clasificar
     puntosKMascercanos = []
-    puntoClasificado = []
+    puntoClasificado = []  # lista donde se guarda el punto clasificado que se va a retornar
+
     # Se calcula la distancia de todos los puntos de entrenamiento con el punto a clasificar
     for x, puntoEntrenamiento in enumerate(datos):
-        distancia = distanciaEuclidiana(punto, puntoEntrenamiento)
-        # se agrega la distancia y el indice del punto de entrenamiento
+        distancia = distanciaEuclidiana(
+            punto, puntoEntrenamiento)  # calculo de la distancia
+
+        # se agrega a distancias el valor de la distancia, la clase y el indice del punto de entrenamiento.
         distancias.append([distancia, puntoEntrenamiento[4], x+1])
     distancias.sort()
     for i in range(k):
+        # se agrega la clase del punto de entrenamiento a la lista de puntos k mas cercanos
         puntosKMascercanos.append(distancias[i][1])
-    # Se obtiene la clase mayoritaria
-    claseMayoritaria = max(set(puntosKMascercanos),
+    claseMayoritaria = max(set(puntosKMascercanos),  # se obtiene la clase mayoritaria de los puntos k mas cercanos
                            key=puntosKMascercanos.count)
 
     # se agrega el punto clasificado
@@ -111,16 +102,20 @@ def clasificarPunto(punto, k):
     return puntoClasificado
 
 
+# puntos es la lista de puntos a clasificar y k es el numero de vecinos mas cercanos a considerar
 def clasificarPuntos(puntos, k):
-    puntosClasificados = []
+    puntosClasificados = []  # lista donde se guardan los puntos clasificados
     i = 0
-    for punto in puntos:
+    for punto in puntos:  # for que recorre los puntos a clasificar
         i += 1
         # print('Clasificando punto: ', i)
         # print("faltan" + str(len(puntos) - i))
         # Porcentaje:
+        # porcentaje de puntos clasificados
         print(str((i/len(puntos))*100) + "%")
+        # clasificacion del punto actual
         puntoClasificado = clasificarPunto(punto, k)
+        # se agrega el punto clasificado a la lista de puntos clasificados
         puntosClasificados.append(puntoClasificado)
     return puntosClasificados
 
