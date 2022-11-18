@@ -22,7 +22,7 @@ def leerDatosEntrenamiento(nombre_archivo):
         for y, atributo in enumerate(atributos):
             # print(x, y, atributo)
             objetos[x][y] = atributo
-            objetos[x][5] = int(x)
+            objetos[x][5] = int(x)# se agrega el indice del punto de entrenamiento
     return objetos
 
 
@@ -60,22 +60,20 @@ print("Datos de prueba:")
 print(datosPrueba)
 # print(datos)
 
+#las funciones leerDatosEntrenamiento(nombre_archivo) y  leerDatosPrueba(nombre_archivo),  respectivamente, estas funciones regresan un arreglo de numpy con los datos de entrenamiento y de prueba, respectivamente. Cada fila del arreglo es un punto, y cada columna es una característica del punto. La última columna es la clase del punto. Se utilizaron 2 funciones debido a que el archivo de entrenamiento y el de prueba tienen un formato diferente.
+
+
+
 
 def distanciaEuclidiana(puntoA, puntoB):
     distancia = math.sqrt((puntoA[0] - puntoB[0])**2 + (puntoA[1] - puntoB[1])
                           ** 2 + (puntoA[2] - puntoB[2])**2 + (puntoA[3] - puntoB[3])**2)
-    # Ciclo for para generar un string que es equivalente a la distancia euclidiana de n dimensiones
-    string = ""
-    for i in range(len(puntoA)-1):
-        string += "(" + str(puntoA[i]) + "-" + str(puntoB[i]) + ")**2 + "
-    string = string[:-3]  # Aqui se quita el ultimo "+"
-    distancia = eval(string)  # Aqui se evalua el string
-
     # Aqui usamos una formula en vez de un ciclo porque es mas rapido, y tiene una complejidad de O(1) en vez de O(n)
     return distancia
 
 
 # punto es un vector de 5 dimensiones, donde las 4 primeras son las características y la última es la clase que tiene el punto.
+
 def clasificarPunto(punto, k):
     distancias = []  # lista donde se guardan las distancias de todos los puntos de entrenamiento con el punto a clasificar
     # lista donde se guardan los puntos de entrenamiento que son los k puntos mas cercanos al punto a clasificar
@@ -126,7 +124,7 @@ puntosClasificados = clasificarPuntos(datosPrueba, 5)
 print('Puntos clasificados')
 for punto in puntosClasificados:
     print(punto)
-# Se obtienen las clases reales y las clases predichas
+# Aqui se obtienen las clases reales y las clases predichas
 clasesReales = []
 clasesPredichas = []
 for punto in datosPrueba:
@@ -217,9 +215,7 @@ def matrizConfusion(clasesReales, clasesPredichas):
 matriz = matrizConfusion(clasesReales, clasesPredichas)
 print(matriz)
 
-# Se calcula la precision
-
-
+# Funcion que calcula la precision de la matriz de confusion
 def precision(matriz):
     precision = 0
     for x in range(len(matriz)):
@@ -241,9 +237,16 @@ def recallClase(matriz):
         recallClase.append(matriz[x][x]/np.sum(matriz[:, x]))
     return recallClase
 
+def fscore(precisionClase, recallClase):
+    fscore = []
+    for x in range(len(precisionClase)):
+        fscore.append(2*precisionClase[x]*recallClase[x]/(precisionClase[x]+recallClase[x]))
+    return fscore
 
 print('Precision: ', precision(matriz))
 print('Precision de cada clase: ', precisionClase(matriz))
 print('Promedio de precision de cada clase: ', np.mean(precisionClase(matriz)))
 print('Recall de cada clase: ', recallClase(matriz))
 print('Promedio de recall de cada clase: ', np.mean(recallClase(matriz)))
+print('Fscore de cada clase: ', fscore(precisionClase(matriz), recallClase(matriz)))
+print('Promedio de fscore de cada clase: ', np.mean(fscore(precisionClase(matriz), recallClase(matriz))))
